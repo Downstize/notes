@@ -35,7 +35,7 @@ using (var scope = app.Services.CreateScope())
 app.UseCors("AllowFrontend");
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment() || app.Environment.IsProduction()) // Сделано специально для тестирования бэка
 {
     app.UseSwagger();
     app.UseSwaggerUI();
