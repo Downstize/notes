@@ -1,0 +1,42 @@
+services:
+  postgres:
+    image: postgres:15
+    container_name: postgres_notes_db
+    restart: always
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: notes
+    ports:
+      - "6432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD", "pg_isready", "-U", "user", "-d", "notes" ]
+      interval: 5s
+      retries: 5
+      timeout: 3s
+
+  backend:
+    build:
+      context: .
+      dockerfile: NotesBackend/Dockerfile
+    container_name: notes_backend
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+  
+  frontend:
+    build:
+      context: ./notes-frontend
+      dockerfile: Dockerfile
+    container_name: notes_frontend
+    ports:
+      - "3000:80"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
